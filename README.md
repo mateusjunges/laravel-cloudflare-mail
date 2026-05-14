@@ -14,6 +14,47 @@ composer require mateusjunges/laravel-cloudflare-mail
 
 The service provider auto registers via Laravel's package discovery. No manual registration needed.
 
+## Quick start
+
+Set the credentials in your `.env`:
+
+```env
+CLOUDFLARE_EMAIL_ACCOUNT_ID=your-account-id
+CLOUDFLARE_EMAIL_API_TOKEN=your-api-token
+MAIL_MAILER=cloudflare
+```
+
+Add the `cloudflare` mailer to `config/mail.php`:
+
+```php
+'mailers' => [
+    // ...
+    'cloudflare' => [
+        'transport' => 'cloudflare',
+    ],
+],
+```
+
+Add the credentials block to `config/services.php`:
+
+```php
+'cloudflare_email' => [
+    'account_id' => env('CLOUDFLARE_EMAIL_ACCOUNT_ID'),
+    'api_token' => env('CLOUDFLARE_EMAIL_API_TOKEN'),
+],
+```
+
+That's it. Your existing mailables and notifications will now be delivered through Cloudflare.
+
+## Documentation
+
+The `docs/` folder covers each topic in more depth:
+
+* [Installation](docs/installation.md). Composer install, local path repositories, and provider registration.
+* [Configuration](docs/configuration.md). Environment variables, config files, and Cloudflare dashboard setup.
+* [Usage](docs/usage.md). Sending mail through the facade, mailables, notifications, and queued jobs.
+* [Error handling](docs/error-handling.md). Exception types, Cloudflare error codes, and retry semantics.
+
 ## License
 
 The MIT License (MIT). See [LICENSE](LICENSE) for details.
