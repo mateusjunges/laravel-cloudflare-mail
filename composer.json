@@ -19,16 +19,19 @@
     "require-dev": {
         "laravel/pint": "^1.20",
         "pestphp/pest": "^4.0",
+        "phpstan/phpstan": "^2.1",
         "rector/rector": "^2.0"
     },
     "scripts": {
+        "phpstan": "vendor/bin/phpstan analyse",
         "pint": "vendor/bin/pint",
         "pint:test": "vendor/bin/pint --test",
         "rector": "vendor/bin/rector process",
         "rector:dry-run": "vendor/bin/rector process --dry-run",
         "cs": [
             "@rector",
-            "@pint"
+            "@pint",
+            "@phpstan"
         ],
         "test": "vendor/bin/pest"
     },
