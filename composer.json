@@ -1,0 +1,60 @@
+{
+    "name": "mateusjunges/laravel-cloudflare-mail",
+    "description": "Cloudflare Email Service transport for Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mateus Junges",
+            "email": "mateus@junges.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "illuminate/http": "^12.0",
+        "illuminate/mail": "^12.0",
+        "illuminate/support": "^12.0",
+        "symfony/mailer": "^7.2|^8.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.20",
+        "pestphp/pest": "^4.0",
+        "rector/rector": "^2.0"
+    },
+    "scripts": {
+        "pint": "vendor/bin/pint",
+        "pint:test": "vendor/bin/pint --test",
+        "rector": "vendor/bin/rector process",
+        "rector:dry-run": "vendor/bin/rector process --dry-run",
+        "cs": [
+            "@rector",
+            "@pint"
+        ],
+        "test": "vendor/bin/pest"
+    },
+    "autoload": {
+        "psr-4": {
+            "Junges\\CloudflareMail\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Junges\\CloudflareMail\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Junges\\CloudflareMail\\CloudflareMailServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
