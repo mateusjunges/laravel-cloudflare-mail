@@ -21,7 +21,7 @@ final class CloudflareTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return 'cloudflare+api://api.cloudflare.com';
+        return 'cloudflare';
     }
 
     protected function doSend(SentMessage $message): void
