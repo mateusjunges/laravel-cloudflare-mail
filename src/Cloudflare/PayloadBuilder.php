@@ -1,0 +1,95 @@
+<?php declare(strict_types=1);
+
+namespace Junges\CloudflareMail\Cloudflare;
+
+use Illuminate\Support\Arr;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
+
+/**
+ * @phpstan-import-type CloudflarePayload from CloudflareTypes
+ * @phpstan-import-type CloudflareAttachment from CloudflareTypes
+ */
+final class PayloadBuilder
+{
+    /** @var list<string> */
+    private const array RESERVED_HEADERS = [
+        'from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject',
+        'date', 'message-id', 'mime-version', 'content-type', 'content-transfer-encoding',
+    ];
+
+    /** @return CloudflarePayload */
+    public function build(Email $email, Envelope $envelope): array
+    {
+        return Arr::whereNotNull([
+            'from' => $this->formatAddress($envelope->getSender()),
+            'to' => $this->formatRecipients($email->getTo() ?: $envelope->getRecipients()),
+            'subject' => $email->getSubject() ?? '',
+            'cc' => $this->formatRecipients($email->getCc()) ?: null,
+            'bcc' => $this->formatRecipients($email->getBcc()) ?: null,
+            'reply_to' => ($replyTo = $email->getReplyTo()) ? $this->formatAddress($replyTo[0]) : null,
+            'text' => $this->normalizeBody($email->getTextBody()),
+            'html' => $this->normalizeBody($email->getHtmlBody()),
+            'headers' => $this->collectCustomHeaders($email) ?: null,
+            'attachments' => $this->collectAttachments($email) ?: null,
+        ]);
+    }
+
+    private function formatAddress(Address $address): string
+    {
+        return $address->getName() !== ''
+            ? sprintf('%s <%s>', $address->getName(), $address->getAddress())
+            : $address->getAddress();
+    }
+
+    /**
+     * @param  list<Address>  $addresses
+     * @return list<string>
+     */
+    private function formatRecipients(array $addresses): array
+    {
+        return array_map($this->formatAddress(...), $addresses);
+    }
+
+    /** @param  string|resource|null  $body */
+    private function normalizeBody(mixed $body): ?string
+    {
+        return match (true) {
+            $body === null => null,
+            is_resource($body) => stream_get_contents($body) ?: null,
+            default => (string) $body,
+        };
+    }
+
+    /** @return array<string, string> */
+    private function collectCustomHeaders(Email $email): array
+    {
+        $headers = [];
+
+        foreach ($email->getHeaders()->all() as $header) {
+            if (in_array(mb_strtolower((string) $header->getName()), self::RESERVED_HEADERS, true)) {
+                continue;
+            }
+
+            $headers[$header->getName()] = $header->getBodyAsString();
+        }
+
+        return $headers;
+    }
+
+    /** @return list<CloudflareAttachment> */
+    private function collectAttachments(Email $email): array
+    {
+        return array_map(
+            fn (DataPart $part): array => [
+                'content' => base64_encode($part->getBody()),
+                'filename' => $part->getFilename() ?? 'attachment',
+                'type' => sprintf('%s/%s', $part->getMediaType(), $part->getMediaSubtype()),
+                'disposition' => $part->getDisposition() === 'inline' ? 'inline' : 'attachment',
+            ],
+            $email->getAttachments(),
+        );
+    }
+}
