@@ -4,7 +4,7 @@ namespace Junges\CloudflareMail\Exceptions;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
-use Junges\CloudflareMail\Cloudflare\CloudflareTypes;
+use Junges\CloudflareMail\Contracts\CloudflareTypes;
 use RuntimeException;
 use Throwable;
 
@@ -51,8 +51,22 @@ final class CloudflareTransportException extends RuntimeException
     public static function fromConnectionFailure(ConnectionException $e): self
     {
         return new self(
-            sprintf('Could not reach the Cloudflare Email Service API: %s', $e->getMessage()),
+            sprintf('Could not reach the Cloudflare Email Sending API: %s', $e->getMessage()),
             previous: $e,
+        );
+    }
+
+    public static function inlineAttachmentsNotSupported(): self
+    {
+        return new self(
+            'Cloudflare Email Sending does not support inline attachments.',
+        );
+    }
+
+    public static function configurationMissing(string $key): self
+    {
+        return new self(
+            sprintf('You are missing a configuration for [%s].', $key)
         );
     }
 }

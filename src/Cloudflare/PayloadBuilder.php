@@ -3,10 +3,13 @@
 namespace Junges\CloudflareMail\Cloudflare;
 
 use Illuminate\Support\Arr;
+use Junges\CloudflareMail\Contracts\CloudflareTypes;
+use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
+use Throwable;
 
 /**
  * @phpstan-import-type CloudflarePayload from CloudflareTypes
@@ -79,16 +82,27 @@ final class PayloadBuilder
         return $headers;
     }
 
-    /** @return list<CloudflareAttachment> */
+    /**
+     * @return list<CloudflareAttachment>
+     *
+     * @throws CloudflareTransportException|Throwable
+     */
     private function collectAttachments(Email $email): array
     {
         return array_map(
-            fn (DataPart $part): array => [
-                'content' => base64_encode($part->getBody()),
-                'filename' => $part->getFilename() ?? 'attachment',
-                'type' => sprintf('%s/%s', $part->getMediaType(), $part->getMediaSubtype()),
-                'disposition' => $part->getDisposition() === 'inline' ? 'inline' : 'attachment',
-            ],
+            function (DataPart $part): array {
+                throw_if(
+                    $part->getDisposition() === 'inline',
+                    CloudflareTransportException::inlineAttachmentsNotSupported(),
+                );
+
+                return [
+                    'content' => base64_encode($part->getBody()),
+                    'filename' => $part->getFilename() ?? 'attachment',
+                    'type' => sprintf('%s/%s', $part->getMediaType(), $part->getMediaSubtype()),
+                    'disposition' => 'attachment',
+                ];
+            },
             $email->getAttachments(),
         );
     }

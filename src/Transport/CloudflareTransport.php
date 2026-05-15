@@ -3,18 +3,23 @@
 namespace Junges\CloudflareMail\Transport;
 
 use Junges\CloudflareMail\Cloudflare\Client;
+use Junges\CloudflareMail\Cloudflare\Config;
 use Junges\CloudflareMail\Cloudflare\PayloadBuilder;
 use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\MessageConverter;
 
 final class CloudflareTransport extends AbstractTransport
 {
     public function __construct(
         private readonly Client $client,
-        private readonly PayloadBuilder $payloadBuilder = new PayloadBuilder(),
+        private readonly PayloadBuilder $payloadBuilder,
+        private readonly Config $config,
+
     ) {
         parent::__construct();
     }
@@ -24,23 +29,41 @@ final class CloudflareTransport extends AbstractTransport
         return 'cloudflare';
     }
 
+    public function config(): Config
+    {
+        return $this->config;
+    }
+
     protected function doSend(SentMessage $message): void
     {
-        $original = $message->getOriginalMessage();
-
-        if (! $original instanceof Email) {
-            throw new TransportException(sprintf(
-                'The Cloudflare transport requires a Symfony Email instance, [%s] given.',
-                $original::class,
-            ));
-        }
-
-        $payload = $this->payloadBuilder->build($original, $message->getEnvelope());
-
         try {
+            $email = $this->asEmail($message);
+
+            $payload = $this->payloadBuilder->build($email, $message->getEnvelope());
+
             $this->client->send($payload);
         } catch (CloudflareTransportException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
+    }
+
+    private function asEmail(SentMessage $message): Email
+    {
+        $original = $message->getOriginalMessage();
+
+        if ($original instanceof Email) {
+            return $original;
+        }
+
+        if ($original instanceof Message) {
+            return MessageConverter::toEmail($original);
+        }
+
+        throw new TransportException(sprintf(
+            'The Cloudflare transport requires a [%s] or [%s] message.[%s] given.',
+            Email::class,
+            Message::class,
+            $original::class,
+        ));
     }
 }
