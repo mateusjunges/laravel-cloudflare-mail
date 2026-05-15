@@ -6,7 +6,7 @@ The driver maps Cloudflare's error responses to two exception types. Code inside
 
 ### `CloudflareTransportException`
 
-Thrown by the HTTP client when Cloudflare returns an unsuccessful response, when the response shape indicates `success: false`, when the response contains permanent bounces, or when the HTTP call cannot reach Cloudflare at all. Construct instances via the named factories rather than the constructor:
+Thrown when Cloudflare returns an unsuccessful response, when the response shape indicates `success: false`, when the response contains permanent bounces, when the HTTP call cannot reach Cloudflare at all, when the message uses a feature the REST API does not support (currently, inline attachments), or when the mailer config block is missing `account_id` or `api_token`. Construct instances via the named factories rather than the constructor:
 
 ```php
 final class CloudflareTransportException extends RuntimeException
@@ -17,10 +17,12 @@ final class CloudflareTransportException extends RuntimeException
     public static function fromResponse(Response $response, array $body): self;
     public static function fromBounces(Response $response, array $bounces): self;
     public static function fromConnectionFailure(ConnectionException $e): self;
+    public static function inlineAttachmentsNotSupported(): self;
+    public static function configurationMissing(string $key): self;
 }
 ```
 
-The `cloudflareCode` property holds the numeric Cloudflare error code (for example, `10004` for throttling). The `httpStatus` property holds the HTTP status returned by the API. Both are zero or null if the failure happened before a response was received (such as a DNS or TLS error).
+The `cloudflareCode` property holds the numeric Cloudflare error code (for example, `10004` for throttling). The `httpStatus` property holds the HTTP status returned by the API. Both are zero or null if the failure happened before a response was received (a DNS or TLS error, or a client side rejection such as an inline attachment).
 
 ### `TransportException`
 
@@ -74,7 +76,7 @@ If you want to log every failed send, hook into Laravel's `MessageSending` and `
 
 ## Common setup mistakes
 
-A 10203 ("sending disabled") response usually means one of three things: the sender domain has not been verified in your Cloudflare account; the API token does not have the email permission; or the account is not enrolled in the Email Service. Check the Cloudflare dashboard before assuming the driver is misbehaving.
+A 10203 ("sending disabled") response usually means one of three things: the sender domain has not been verified in your Cloudflare account; the API token does not have the email permission; or the account is not enrolled in Email Sending. Check the Cloudflare dashboard before assuming the driver is misbehaving.
 
 A 10200 ("invalid email") response is almost always a malformed `from` or `to` address. Double check `MAIL_FROM_ADDRESS` and any per mailable overrides.
 

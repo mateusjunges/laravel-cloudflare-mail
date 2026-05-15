@@ -1,6 +1,6 @@
 # Configuration
 
-The driver expects three things. A pair of credentials in your environment, a mailer block in `config/mail.php`, and a services block in `config/services.php`.
+The driver expects three things. A pair of credentials in your environment, a mailer block in `config/mail.php`, and a credentials block in `config/services.php`.
 
 ## Environment variables
 
@@ -23,7 +23,7 @@ You can also leave `MAIL_MAILER` pointed at another driver and explicitly route 
 
 ## `config/mail.php`
 
-Register the mailer alongside the other transports. The credentials are read from `config/services.php`, so the block here only needs the transport name.
+Register the mailer alongside the other transports. The block only needs the transport name; the credentials live in `config/services.php` (the same convention Laravel's built in Postmark and SES drivers follow).
 
 ```php
 'mailers' => [
@@ -36,32 +36,40 @@ Register the mailer alongside the other transports. The credentials are read fro
 
 ## `config/services.php`
 
-Add the credentials block. The keys here mirror the environment variable names.
+Add the credentials block. The driver reads `services.cloudflare` whenever a value is missing from the mailer block.
 
 ```php
-'cloudflare_email' => [
+'cloudflare' => [
     'account_id' => env('CLOUDFLARE_EMAIL_ACCOUNT_ID'),
     'api_token' => env('CLOUDFLARE_EMAIL_API_TOKEN'),
+    'base_url' => env('CLOUDFLARE_EMAIL_BASE_URL'),
 ],
 ```
 
-The service provider will throw a `RuntimeException` at resolution time if either value is empty, so a misconfigured environment fails loudly the first time you try to send an email through the driver.
+The driver throws a `CloudflareTransportException` at resolution time if either `account_id` or `api_token` is missing or blank in both places, so a misconfigured environment fails loudly the first time you try to send an email through the driver.
 
-## Inline overrides
+## Custom base URL (optional)
 
-If you prefer keeping credentials inside the mailer block itself (for instance, to scope different mailers to different Cloudflare accounts), pass them directly:
+`base_url` defaults to the production Cloudflare endpoint (`https://api.cloudflare.com/client/v4`). Set it through the env var (or directly in `services.php` or the mailer block) when you want to point the driver at a different endpoint, for example a regional cluster or a mock server during integration testing.
+
+## Per mailer overrides
+
+Any key set directly on the mailer block wins over the matching value in `config/services.php`. That makes it easy to scope a separate mailer entry to a different Cloudflare account, for example a transactional account and a marketing account:
 
 ```php
 'mailers' => [
     'cloudflare' => [
         'transport' => 'cloudflare',
-        'account_id' => env('CLOUDFLARE_EMAIL_ACCOUNT_ID'),
-        'api_token' => env('CLOUDFLARE_EMAIL_API_TOKEN'),
+    ],
+    'cloudflare-marketing' => [
+        'transport' => 'cloudflare',
+        'account_id' => env('CLOUDFLARE_EMAIL_MARKETING_ACCOUNT_ID'),
+        'api_token' => env('CLOUDFLARE_EMAIL_MARKETING_API_TOKEN'),
     ],
 ],
 ```
 
-The driver prefers values from the mailer block when present, and falls back to `config/services.php` otherwise.
+The first entry reads everything from `services.cloudflare`. The second overrides the credentials inline. Route through the second account with `Mail::mailer('cloudflare-marketing')->send(...)`.
 
 ## Cloudflare dashboard setup
 

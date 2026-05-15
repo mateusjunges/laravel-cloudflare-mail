@@ -88,7 +88,7 @@ Mail::to($user)->send(
 
 The driver encodes attachments as base64 and includes them in the API payload. Cloudflare enforces a 5 MiB limit on the total message size, including the encoded attachment payload. Exceeding this returns error code 10202 ("email.sending.error.email.too_big"); see [Error handling](error-handling.md).
 
-Inline images (parts marked with the inline disposition) are passed through. Cloudflare's API does not document a content ID field at this time, so cross referencing inline parts with `cid:` URLs in HTML may not work as expected. If you need inline images for your use case, plan on testing carefully against the live API.
+Inline attachments are not supported. Cloudflare Email Sending has no field for inline parts or content IDs, so a message that embeds an image (for example, via `cid:` references in HTML) is rejected before any HTTP call. The driver throws a `CloudflareTransportException`, which the transport surfaces as a Symfony `TransportException`. If you need imagery in an email, link to a hosted image instead of embedding it, or send it as a regular attachment.
 
 ## Custom headers
 
