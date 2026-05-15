@@ -35,16 +35,16 @@ Add the `cloudflare` mailer to `config/mail.php`:
 ],
 ```
 
-Add the credentials block to `config/services.php`:
+Add the credentials block to `config/services.php` (the same convention Laravel's built in Postmark and SES drivers follow):
 
 ```php
-'cloudflare_email' => [
+'cloudflare' => [
     'account_id' => env('CLOUDFLARE_EMAIL_ACCOUNT_ID'),
     'api_token' => env('CLOUDFLARE_EMAIL_API_TOKEN'),
 ],
 ```
 
-That's it. Your existing mailables and notifications will now be delivered through Cloudflare.
+That's it. Your existing mailables and notifications will now be delivered through Cloudflare. Any key set on the mailer block overrides the matching value in `services.cloudflare`, which is handy for scoping a second mailer entry to a different account.
 
 ## Documentation
 
