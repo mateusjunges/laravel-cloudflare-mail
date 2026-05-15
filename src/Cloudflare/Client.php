@@ -3,8 +3,9 @@
 namespace Junges\CloudflareMail\Cloudflare;
 
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Http;
+use Junges\CloudflareMail\Contracts\CloudflareTypes;
 use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 use SensitiveParameter;
 
@@ -14,12 +15,10 @@ use SensitiveParameter;
  */
 final readonly class Client
 {
-    private const string BASE_URL = 'https://api.cloudflare.com/client/v4';
-
     public function __construct(
         private string $accountId,
         #[SensitiveParameter] private string $apiToken,
-        private Factory $http,
+        private string $baseUrl = 'https://api.cloudflare.com/client/v4',
     ) {}
 
     /** @param  CloudflarePayload  $payload */
@@ -38,14 +37,12 @@ final readonly class Client
     private function post(array $payload): Response
     {
         try {
-            $url = sprintf('%s/accounts/%s/email/sending/send', self::BASE_URL, $this->accountId);
+            $url = sprintf('%s/accounts/%s/email/sending/send', $this->baseUrl, $this->accountId);
 
-            return $this->http
-                ->withToken($this->apiToken)
+            return Http::withToken($this->apiToken)
                 ->acceptJson()
                 ->asJson()
                 ->post($url, $payload);
-
         } catch (ConnectionException $e) {
             throw CloudflareTransportException::fromConnectionFailure($e);
         }
@@ -70,6 +67,9 @@ final readonly class Client
     {
         $bounces = data_get($body, 'result.permanent_bounces', []);
 
-        throw_if(filled($bounces), CloudflareTransportException::fromBounces($response, $bounces));
+        throw_if(
+            filled($bounces),
+            CloudflareTransportException::fromBounces($response, $bounces)
+        );
     }
 }
