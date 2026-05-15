@@ -1,5 +1,7 @@
 # Laravel Cloudflare Mail
 
+![Readme Banner](art/readme-banner.png)
+
 A Laravel mail driver for [Cloudflare Email Service](https://developers.cloudflare.com/email-service/), the outbound email API on Cloudflare's network. Once installed and configured, the driver plugs into Laravel's mail abstraction. Setting `MAIL_MAILER=cloudflare` is enough to route every `Mail::send`, queued mailable, and notification through Cloudflare.
 
 ## Requirements
