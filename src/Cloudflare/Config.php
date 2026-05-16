@@ -10,6 +10,7 @@ final readonly class Config
         public string $accountId,
         public string $apiToken,
         public string $baseUrl,
+        public int $timeout,
     ) {}
 
     /** @param  array<string, mixed>  $config */
@@ -28,11 +29,13 @@ final readonly class Config
         }
 
         $baseUrl = self::stringValue($config, 'base_url') ?: 'https://api.cloudflare.com/client/v4';
+        $timeout = self::intValue($config, 'timeout') ?: 10;
 
         return new self(
             accountId: $accountId,
             apiToken: $apiToken,
             baseUrl: $baseUrl,
+            timeout: $timeout,
         );
     }
 
@@ -42,5 +45,13 @@ final readonly class Config
         $value = $config[$key] ?? null;
 
         return is_string($value) ? mb_trim($value) : '';
+    }
+
+    /** @param  array<string, mixed>  $config */
+    private static function intValue(array $config, string $key): int
+    {
+        $value = $config[$key] ?? null;
+
+        return is_int($value) ? $value : 0;
     }
 }

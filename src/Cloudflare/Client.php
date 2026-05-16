@@ -18,7 +18,8 @@ final readonly class Client
     public function __construct(
         private string $accountId,
         #[SensitiveParameter] private string $apiToken,
-        private string $baseUrl = 'https://api.cloudflare.com/client/v4',
+        private string $baseUrl,
+        private int $timeout,
     ) {}
 
     /** @param  CloudflarePayload  $payload */
@@ -40,6 +41,7 @@ final readonly class Client
             $url = sprintf('%s/accounts/%s/email/sending/send', $this->baseUrl, $this->accountId);
 
             return Http::withToken($this->apiToken)
+                ->timeout($this->timeout)
                 ->acceptJson()
                 ->asJson()
                 ->post($url, $payload);

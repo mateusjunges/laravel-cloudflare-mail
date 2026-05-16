@@ -45,6 +45,7 @@ Add the credentials block. The driver reads `services.cloudflare` whenever a val
     'account_id' => env('CLOUDFLARE_EMAIL_ACCOUNT_ID'),
     'api_token' => env('CLOUDFLARE_EMAIL_API_TOKEN'),
     'base_url' => env('CLOUDFLARE_EMAIL_BASE_URL'),
+    'timeout' => env('CLOUDFLARE_EMAIL_TIMEOUT'),
 ],
 ```
 
@@ -53,6 +54,10 @@ The driver throws a `CloudflareTransportException` at resolution time if either 
 ## Custom base URL (optional)
 
 `base_url` defaults to the production Cloudflare endpoint (`https://api.cloudflare.com/client/v4`). Set it through the env var (or directly in `services.php` or the mailer block) when you want to point the driver at a different endpoint, for example a regional cluster or a mock server during integration testing.
+
+## Request timeout (optional)
+
+`timeout` controls the HTTP request timeout in seconds when calling the Cloudflare Email Sending API. It defaults to 10 seconds. Tune it through the env var or the mailer block when you have a slow upstream or stricter SLAs for queue workers. A connection timeout surfaces as a `CloudflareTransportException`.
 
 ## Per mailer overrides
 

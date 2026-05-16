@@ -3,7 +3,6 @@
 namespace Junges\CloudflareMail\Transport;
 
 use Junges\CloudflareMail\Cloudflare\Client;
-use Junges\CloudflareMail\Cloudflare\Config;
 use Junges\CloudflareMail\Cloudflare\PayloadBuilder;
 use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -18,8 +17,6 @@ final class CloudflareTransport extends AbstractTransport
     public function __construct(
         private readonly Client $client,
         private readonly PayloadBuilder $payloadBuilder,
-        private readonly Config $config,
-
     ) {
         parent::__construct();
     }
@@ -27,11 +24,6 @@ final class CloudflareTransport extends AbstractTransport
     public function __toString(): string
     {
         return 'cloudflare';
-    }
-
-    public function config(): Config
-    {
-        return $this->config;
     }
 
     protected function doSend(SentMessage $message): void
