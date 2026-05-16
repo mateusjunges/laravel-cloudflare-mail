@@ -1,5 +1,9 @@
 # Laravel Cloudflare Mail
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/mateusjunges/laravel-cloudflare-mail.svg?style=flat-square)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
+[![Total Downloads](https://img.shields.io/packagist/dt/mateusjunges/laravel-cloudflare-mail.svg?style=flat-square)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
+[![Continuous Integration](https://img.shields.io/github/actions/workflow/status/mateusjunges/laravel-cloudflare-mail/ci.yml?branch=main&label=Continuous%20Integration&style=flat-square)](https://github.com/mateusjunges/laravel-cloudflare-mail/actions/workflows/ci.yml)
+
 ![Readme Banner](art/readme-banner.png)
 
 A Laravel mail driver for [Cloudflare Email Service](https://developers.cloudflare.com/email-service/), the outbound email API on Cloudflare's network. Once installed and configured, every `Mail::send`, queued mailable, and notification routes through Cloudflare via Laravel's mail abstraction.
