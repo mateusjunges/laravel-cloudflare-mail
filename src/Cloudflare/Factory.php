@@ -11,7 +11,7 @@ final readonly class Factory
         private PayloadBuilder $payloadBuilder,
     ) {}
 
-    /** @param  array<string, mixed>  $config */
+    /** @param  array<array-key, mixed>  $config */
     public function make(array $config = []): CloudflareTransport
     {
         $cloudflareConfig = Config::fromArray([

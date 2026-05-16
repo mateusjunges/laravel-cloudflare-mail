@@ -15,24 +15,32 @@ final readonly class Config
     /** @param  array<string, mixed>  $config */
     public static function fromArray(array $config): self
     {
-        $accountId = mb_trim((string) ($config['account_id'] ?? ''));
+        $accountId = self::stringValue($config, 'account_id');
 
         if (blank($accountId)) {
             throw CloudflareTransportException::configurationMissing('account_id');
         }
 
-        $apiToken = mb_trim((string) ($config['api_token'] ?? ''));
+        $apiToken = self::stringValue($config, 'api_token');
 
         if (blank($apiToken)) {
             throw CloudflareTransportException::configurationMissing('api_token');
         }
 
-        $baseUrl = mb_trim((string) ($config['base_url'] ?? 'https://api.cloudflare.com/client/v4'));
+        $baseUrl = self::stringValue($config, 'base_url') ?: 'https://api.cloudflare.com/client/v4';
 
         return new self(
             accountId: $accountId,
             apiToken: $apiToken,
             baseUrl: $baseUrl,
         );
+    }
+
+    /** @param  array<string, mixed>  $config */
+    private static function stringValue(array $config, string $key): string
+    {
+        $value = $config[$key] ?? null;
+
+        return is_string($value) ? mb_trim($value) : '';
     }
 }
