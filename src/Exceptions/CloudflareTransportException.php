@@ -30,8 +30,8 @@ final class CloudflareTransportException extends RuntimeException
         $code = data_get($body, 'errors.0.code', 0);
         $code = is_int($code) ? $code : 0;
 
-        $message = data_get($body, 'errors.0.message', $defaultMessage);
-        $message = is_string($message) ? $message : $defaultMessage;
+        $message = data_get($body, 'errors.0.message');
+        $message = is_string($message) && filled($message) ? $message : $defaultMessage;
 
         return new self(
             sprintf('Unable to send email: %s (code %d).', $message, $code),
