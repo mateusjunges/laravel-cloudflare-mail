@@ -4,7 +4,6 @@ namespace Junges\CloudflareMail\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
 use Junges\CloudflareMail\Cloudflare\Client;
-use Junges\CloudflareMail\Cloudflare\Config;
 use Junges\CloudflareMail\Cloudflare\PayloadBuilder;
 use Junges\CloudflareMail\Transport\CloudflareTransport;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -14,9 +13,8 @@ use Symfony\Component\Mime\Part\DataPart;
 function transport(): CloudflareTransport
 {
     return new CloudflareTransport(
-        client: new Client('acct', 'tok'),
+        client: new Client('acct', 'tok', 'https://api.cloudflare.com/client/v4', 10),
         payloadBuilder: new PayloadBuilder(),
-        config: new Config('acct', 'tok', 'https://api.cloudflare.com/client/v4'),
     );
 }
 

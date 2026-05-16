@@ -28,8 +28,8 @@ it('serializes from, to, subject, text, and html', function (): void {
 
     $payload = buildPayload($email);
 
-    expect($payload['from'])->toBe('Sender Name <sender@example.com>');
-    expect($payload['to'])->toBe(['Recipient <rcpt@example.com>']);
+    expect($payload['from'])->toBe('"Sender Name" <sender@example.com>');
+    expect($payload['to'])->toBe(['"Recipient" <rcpt@example.com>']);
     expect($payload['subject'])->toBe('Subject line');
     expect($payload['text'])->toBe('Plain body');
     expect($payload['html'])->toBe('<p>HTML body</p>');
@@ -60,9 +60,9 @@ it('serializes cc, bcc, and reply_to', function (): void {
 
     $payload = buildPayload($email);
 
-    expect($payload['cc'])->toBe(['cc1@example.com', 'Two <cc2@example.com>']);
+    expect($payload['cc'])->toBe(['cc1@example.com', '"Two" <cc2@example.com>']);
     expect($payload['bcc'])->toBe(['bcc@example.com']);
-    expect($payload['reply_to'])->toBe('Reply <reply@example.com>');
+    expect($payload['reply_to'])->toBe('"Reply" <reply@example.com>');
 });
 
 it('omits cc, bcc, reply_to, html, headers, and attachments when empty', function (): void {
@@ -129,6 +129,19 @@ it('rejects inline attachments since Cloudflare does not support it', function (
         ->toThrow(CloudflareTransportException::class, 'does not support inline attachments');
 });
 
+it('escapes display names that contain RFC 5322 special characters', function (): void {
+    $email = new Email()
+        ->from(new Address('sender@example.com', 'Smith, John'))
+        ->to(new Address('rcpt@example.com', 'Doe "the boss"'))
+        ->subject('s')
+        ->text('t');
+
+    $payload = buildPayload($email);
+
+    expect($payload['from'])->toBe('"Smith, John" <sender@example.com>');
+    expect($payload['to'])->toBe(['"Doe \\"the boss\\"" <rcpt@example.com>']);
+});
+
 it('handles multiple to-recipients as an array of formatted strings', function (): void {
     $email = new Email()
         ->from('sender@example.com')
@@ -138,5 +151,5 @@ it('handles multiple to-recipients as an array of formatted strings', function (
 
     $payload = buildPayload($email);
 
-    expect($payload['to'])->toBe(['a@example.com', 'Bee <b@example.com>']);
+    expect($payload['to'])->toBe(['a@example.com', '"Bee" <b@example.com>']);
 });

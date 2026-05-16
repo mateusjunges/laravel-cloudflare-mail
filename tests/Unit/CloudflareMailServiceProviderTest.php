@@ -8,6 +8,29 @@ use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 use Junges\CloudflareMail\Transport\CloudflareTransport;
 use Symfony\Component\Mime\Email;
 
+function fakeAcceptedResponse(): void
+{
+    Http::fake([
+        '*' => Http::response([
+            'success' => true,
+            'errors' => [],
+            'messages' => [],
+            'result' => ['delivered' => ['rcpt@example.com'], 'permanent_bounces' => [], 'queued' => []],
+        ], 200),
+    ]);
+}
+
+function sendThroughCloudflare(): void
+{
+    Mail::mailer('cloudflare')->getSymfonyTransport()->send(
+        new Email()
+            ->from('sender@example.com')
+            ->to('rcpt@example.com')
+            ->subject('s')
+            ->text('t'),
+    );
+}
+
 it('resolves the cloudflare mailer to the Cloudflare transport', function (): void {
     config()->set('mail.mailers.cloudflare', [
         'transport' => 'cloudflare',
@@ -41,19 +64,17 @@ it('throws when resolving without an api_token', function (): void {
 });
 
 it('falls back to services.cloudflare when the mailer block is bare', function (): void {
-    config()->set('mail.mailers.cloudflare', [
-        'transport' => 'cloudflare',
-    ]);
+    config()->set('mail.mailers.cloudflare', ['transport' => 'cloudflare']);
     config()->set('services.cloudflare', [
         'account_id' => 'acct-from-services',
         'api_token' => 'tok-from-services',
     ]);
 
-    $transport = Mail::mailer('cloudflare')->getSymfonyTransport();
+    fakeAcceptedResponse();
+    sendThroughCloudflare();
 
-    expect($transport)->toBeInstanceOf(CloudflareTransport::class);
-    expect($transport->config()->accountId)->toBe('acct-from-services');
-    expect($transport->config()->apiToken)->toBe('tok-from-services');
+    Http::assertSent(fn ($request): bool => str_contains((string) $request->url(), '/accounts/acct-from-services/')
+        && $request->header('Authorization')[0] === 'Bearer tok-from-services');
 });
 
 it('prefers credentials from the mailer block over services.cloudflare', function (): void {
@@ -67,10 +88,11 @@ it('prefers credentials from the mailer block over services.cloudflare', functio
         'api_token' => 'tok-from-services',
     ]);
 
-    $transport = Mail::mailer('cloudflare')->getSymfonyTransport();
+    fakeAcceptedResponse();
+    sendThroughCloudflare();
 
-    expect($transport->config()->accountId)->toBe('acct-from-mailer');
-    expect($transport->config()->apiToken)->toBe('tok-from-mailer');
+    Http::assertSent(fn ($request): bool => str_contains((string) $request->url(), '/accounts/acct-from-mailer/')
+        && $request->header('Authorization')[0] === 'Bearer tok-from-mailer');
 });
 
 it('routes requests at the base_url from the mailer config', function (): void {
@@ -81,24 +103,10 @@ it('routes requests at the base_url from the mailer config', function (): void {
         'base_url' => 'https://staging.cloudflare.example/v4',
     ]);
 
-    Http::fake([
-        '*' => Http::response([
-            'success' => true,
-            'errors' => [],
-            'messages' => [],
-            'result' => ['delivered' => ['rcpt@example.com'], 'permanent_bounces' => [], 'queued' => []],
-        ], 200),
-    ]);
+    fakeAcceptedResponse();
+    sendThroughCloudflare();
 
-    Mail::mailer('cloudflare')->getSymfonyTransport()->send(
-        new Email()
-            ->from('sender@example.com')
-            ->to('rcpt@example.com')
-            ->subject('s')
-            ->text('t'),
-    );
-
-    Http::assertSent(fn ($request) => str_starts_with(
+    Http::assertSent(fn ($request): bool => str_starts_with(
         (string) $request->url(),
         'https://staging.cloudflare.example/v4/accounts/acct-123/',
     ));
