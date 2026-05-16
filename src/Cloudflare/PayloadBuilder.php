@@ -2,12 +2,12 @@
 
 namespace Junges\CloudflareMail\Cloudflare;
 
-use Illuminate\Support\Arr;
 use Junges\CloudflareMail\Contracts\CloudflareTypes;
 use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Throwable;
 
@@ -26,18 +26,41 @@ final class PayloadBuilder
     /** @return CloudflarePayload */
     public function build(Email $email, Envelope $envelope): array
     {
-        return Arr::whereNotNull([
+        $payload = [
             'from' => $this->formatAddress($envelope->getSender()),
             'to' => $this->formatRecipients($email->getTo() ?: $envelope->getRecipients()),
             'subject' => $email->getSubject() ?? '',
-            'cc' => $this->formatRecipients($email->getCc()) ?: null,
-            'bcc' => $this->formatRecipients($email->getBcc()) ?: null,
-            'reply_to' => ($replyTo = $email->getReplyTo()) ? $this->formatAddress($replyTo[0]) : null,
-            'text' => $this->normalizeBody($email->getTextBody()),
-            'html' => $this->normalizeBody($email->getHtmlBody()),
-            'headers' => $this->collectCustomHeaders($email) ?: null,
-            'attachments' => $this->collectAttachments($email) ?: null,
-        ]);
+        ];
+
+        if ($cc = $this->formatRecipients($email->getCc())) {
+            $payload['cc'] = $cc;
+        }
+
+        if ($bcc = $this->formatRecipients($email->getBcc())) {
+            $payload['bcc'] = $bcc;
+        }
+
+        if ($replyTo = $email->getReplyTo()) {
+            $payload['reply_to'] = $this->formatAddress($replyTo[0]);
+        }
+
+        if (($text = $this->normalizeBody($email->getTextBody())) !== null) {
+            $payload['text'] = $text;
+        }
+
+        if (($html = $this->normalizeBody($email->getHtmlBody())) !== null) {
+            $payload['html'] = $html;
+        }
+
+        if ($headers = $this->collectCustomHeaders($email)) {
+            $payload['headers'] = $headers;
+        }
+
+        if ($attachments = $this->collectAttachments($email)) {
+            $payload['attachments'] = $attachments;
+        }
+
+        return $payload;
     }
 
     private function formatAddress(Address $address): string
@@ -48,12 +71,12 @@ final class PayloadBuilder
     }
 
     /**
-     * @param  list<Address>  $addresses
+     * @param  array<Address>  $addresses
      * @return list<string>
      */
     private function formatRecipients(array $addresses): array
     {
-        return array_map($this->formatAddress(...), $addresses);
+        return array_values(array_map($this->formatAddress(...), $addresses));
     }
 
     /** @param  string|resource|null  $body */
@@ -72,7 +95,11 @@ final class PayloadBuilder
         $headers = [];
 
         foreach ($email->getHeaders()->all() as $header) {
-            if (in_array(mb_strtolower((string) $header->getName()), self::RESERVED_HEADERS, true)) {
+            if (! $header instanceof HeaderInterface) {
+                continue;
+            }
+
+            if (in_array(mb_strtolower($header->getName()), self::RESERVED_HEADERS, true)) {
                 continue;
             }
 
@@ -89,7 +116,7 @@ final class PayloadBuilder
      */
     private function collectAttachments(Email $email): array
     {
-        return array_map(
+        return array_values(array_map(
             function (DataPart $part): array {
                 throw_if(
                     $part->getDisposition() === 'inline',
@@ -104,6 +131,6 @@ final class PayloadBuilder
                 ];
             },
             $email->getAttachments(),
-        );
+        ));
     }
 }

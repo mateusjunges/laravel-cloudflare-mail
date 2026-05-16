@@ -66,6 +66,7 @@ final readonly class Client
     private function ensureNoBounces(Response $response, array $body): void
     {
         $bounces = data_get($body, 'result.permanent_bounces', []);
+        $bounces = is_array($bounces) ? array_values(array_filter($bounces, 'is_string')) : [];
 
         throw_if(
             filled($bounces),

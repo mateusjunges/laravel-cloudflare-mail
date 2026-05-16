@@ -25,12 +25,13 @@ final class CloudflareTransportException extends RuntimeException
     /** @param  CloudflareResponseBody  $body */
     public static function fromResponse(Response $response, array $body): self
     {
-        $code = (int) data_get($body, 'errors.0.code', 0);
-        $message = (string) data_get(
-            $body,
-            'errors.0.message',
-            sprintf('Cloudflare Email Service returned HTTP %d.', $response->status()),
-        );
+        $defaultMessage = sprintf('Cloudflare Email Service returned HTTP %d.', $response->status());
+
+        $code = data_get($body, 'errors.0.code', 0);
+        $code = is_int($code) ? $code : 0;
+
+        $message = data_get($body, 'errors.0.message', $defaultMessage);
+        $message = is_string($message) ? $message : $defaultMessage;
 
         return new self(
             sprintf('Unable to send email: %s (code %d).', $message, $code),
