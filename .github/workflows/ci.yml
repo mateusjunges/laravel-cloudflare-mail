@@ -43,10 +43,10 @@ jobs:
           composer update --prefer-dist --no-interaction --no-progress
 
       - name: Run Pint
-        run: vendor/bin/pint --test
+        run: composer pint:test
 
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
+        run: composer phpstan:ci
 
-      - name: Run Pest
-        run: vendor/bin/pest
+      - name: Run Tests
+        run: composer test

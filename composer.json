@@ -25,6 +25,7 @@
     },
     "scripts": {
         "phpstan": "vendor/bin/phpstan analyse",
+        "phpstan:ci": "vendor/bin/phpstan analyse --no-progress",
         "pint": "vendor/bin/pint",
         "pint:test": "vendor/bin/pint --test",
         "rector": "vendor/bin/rector process",
