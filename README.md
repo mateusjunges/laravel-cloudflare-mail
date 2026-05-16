@@ -1,8 +1,8 @@
 # Laravel Cloudflare Mail
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/mateusjunges/laravel-cloudflare-mail.svg?style=flat-square)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
-[![Total Downloads](https://img.shields.io/packagist/dt/mateusjunges/laravel-cloudflare-mail.svg?style=flat-square)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
-[![Continuous Integration](https://img.shields.io/github/actions/workflow/status/mateusjunges/laravel-cloudflare-mail/ci.yml?branch=main&label=Continuous%20Integration&style=flat-square)](https://github.com/mateusjunges/laravel-cloudflare-mail/actions/workflows/ci.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/mateusjunges/laravel-cloudflare-mail.svg?label=Latest%20version%20on%20Packagist)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
+[![Total Downloads](https://img.shields.io/packagist/dt/mateusjunges/laravel-cloudflare-mail.svg?style=flat&label=Total%20Downloads)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
+[![Continuous Integration](https://github.com/mateusjunges/laravel-cloudflare-mail/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusjunges/laravel-cloudflare-mail/actions/workflows/ci.yml)
 
 ![Readme Banner](art/readme-banner.png)
 
