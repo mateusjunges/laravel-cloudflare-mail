@@ -1,7 +1,8 @@
 # Laravel Cloudflare Mail
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/mateusjunges/laravel-cloudflare-mail.svg?label=Latest%20version%20on%20Packagist)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
-[![Total Downloads](https://img.shields.io/packagist/dt/mateusjunges/laravel-cloudflare-mail.svg?style=flat&label=Total%20Downloads)](https://packagist.org/packages/mateusjunges/laravel-cloudflare-mail)
+![Packagist Version](https://img.shields.io/packagist/v/mateusjunges/laravel-cloudflare-mail?label=Latest%20version%20on%20Packagist)
+![Packagist Downloads](https://img.shields.io/packagist/dt/mateusjunges/laravel-cloudflare-mail?style=flat&label=Total%20Downloads)
+[![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE)
 [![Continuous Integration](https://github.com/mateusjunges/laravel-cloudflare-mail/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusjunges/laravel-cloudflare-mail/actions/workflows/ci.yml)
 
 ![Readme Banner](art/readme-banner.png)
