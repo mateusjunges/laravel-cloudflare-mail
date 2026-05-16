@@ -65,9 +65,7 @@ final class PayloadBuilder
 
     private function formatAddress(Address $address): string
     {
-        return $address->getName() !== ''
-            ? sprintf('%s <%s>', $address->getName(), $address->getAddress())
-            : $address->getAddress();
+        return $address->toString();
     }
 
     /**
