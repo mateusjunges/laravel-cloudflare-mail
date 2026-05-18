@@ -14,7 +14,7 @@ This pulls in the package along with its dependencies (`illuminate/http`, `illum
 
 ## Service provider
 
-The package ships with auto discovery. Laravel registers `Junges\CloudflareMail\CloudflareMailServiceProvider` automatically when the package is installed. You should not need to add anything to `bootstrap/providers.php`.
+The package ships with auto discovery. Laravel registers `Junges\CloudflareMail\Providers\CloudflareMailServiceProvider` automatically when the package is installed. You should not need to add anything to `bootstrap/providers.php`.
 
 If your project opts out of auto discovery (via `extra.laravel.dont-discover`), add the provider manually:
 
@@ -22,34 +22,9 @@ If your project opts out of auto discovery (via `extra.laravel.dont-discover`), 
 // bootstrap/providers.php
 return [
     // ...
-    Junges\CloudflareMail\CloudflareMailServiceProvider::class,
+    Junges\CloudflareMail\Providers\CloudflareMailServiceProvider::class,
 ];
 ```
-
-## Installing from a local path
-
-If you keep the package in your monorepo (for example, under `packages/laravel-cloudflare-mail`) and have not published it to Packagist yet, configure a path repository in your root `composer.json`:
-
-```json
-{
-    "require": {
-        "mateusjunges/laravel-cloudflare-mail": "@dev"
-    },
-    "repositories": {
-        "cloudflare-mail": {
-            "type": "path",
-            "url": "packages/laravel-cloudflare-mail",
-            "options": {
-                "symlink": true
-            }
-        }
-    }
-}
-```
-
-Then run `composer update mateusjunges/laravel-cloudflare-mail`. Composer creates a symlink under `vendor/mateusjunges/laravel-cloudflare-mail` pointing back at your package directory, so edits to the source are picked up immediately.
-
-The `@dev` constraint is required because path packages report a `dev-<branch>` version that your root `minimum-stability: stable` would otherwise reject.
 
 ## Next step
 

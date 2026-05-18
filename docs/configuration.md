@@ -11,6 +11,8 @@ CLOUDFLARE_EMAIL_ACCOUNT_ID=your-cloudflare-account-id
 CLOUDFLARE_EMAIL_API_TOKEN=your-cloudflare-api-token
 ```
 
+The optional `CLOUDFLARE_EMAIL_BASE_URL` and `CLOUDFLARE_EMAIL_TIMEOUT` env vars override the default API endpoint and the 10 second HTTP timeout respectively. See the sections below for details.
+
 The account ID is visible in the Cloudflare dashboard URL when you open your account. The API token must be scoped with the email sending permission. Create it from the [Cloudflare dashboard](https://dash.cloudflare.com/profile/api-tokens) under "My Profile" then "API Tokens", choose "Create Custom Token", and set the permission group to Account, Email Sending.
 
 ![Creating a Cloudflare API token with the Email Sending permission](images/cloudflare-api-token.png)

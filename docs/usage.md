@@ -99,12 +99,9 @@ public function envelope(): Envelope
 {
     return new Envelope(
         subject: 'Welcome',
-        metadata: [
-            // metadata is Laravel's own thing; Symfony writes it to headers like X-Metadata-*.
-        ],
         using: [
             function (Email $message): void {
-                $message->getHeaders()->addTextHeader('X-Tenant-Id', auth()->user()->organization_id);
+                $message->getHeaders()->addTextHeader('X-Tenant-Id', (string) auth()->user()->organization_id);
             },
         ],
     );
