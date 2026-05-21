@@ -2,7 +2,7 @@
 
 ## Requirements
 
-PHP 8.4 or newer. Laravel 12.0 or newer. A Cloudflare account with a verified sender domain and an API token with the email sending permission.
+PHP 8.4 or newer. Laravel 12 or 13. A Cloudflare account with a verified sender domain and an API token with the email sending permission.
 
 ## Install via Composer
 

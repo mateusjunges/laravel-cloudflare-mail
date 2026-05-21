@@ -4,6 +4,9 @@ namespace Junges\CloudflareMail\Cloudflare;
 
 use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 
+/**
+ * @internal This class is not part of the package's public API and may change in any release.
+ */
 final readonly class Config
 {
     public function __construct(

@@ -11,7 +11,7 @@ A Laravel mail driver for [Cloudflare Email Service](https://developers.cloudfla
 
 ## Requirements
 
-PHP 8.4 or newer. Laravel 12.0 or newer. A Cloudflare account with a verified sender domain and an API token that has the email sending permission.
+PHP 8.4 or newer. Laravel 12 or 13. A Cloudflare account with a verified sender domain and an API token that has the email sending permission.
 
 ## Installation
 
@@ -61,6 +61,35 @@ The `docs/` folder covers each topic in more depth:
 * [Configuration](docs/configuration.md). Environment variables, config files, and Cloudflare dashboard setup.
 * [Usage](docs/usage.md). Sending mail through the facade, mailables, notifications, and queued jobs.
 * [Error handling](docs/error-handling.md). Exception types, Cloudflare error codes, and retry semantics.
+
+## Versioning
+
+This package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The public API consists of the `cloudflare` mailer configuration keys and the `Junges\CloudflareMail\Exceptions\CloudflareTransportException` class. Every other class is marked `@internal` and may change in any release, so depend only on the documented configuration and the Laravel mail abstraction.
+
+## Testing
+
+```bash
+composer test
+```
+
+The `composer cs` script runs Rector, Pint, and PHPStan together.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for what has changed recently.
+
+## Contributing
+
+Contributions are welcome. Please open an issue to discuss substantial changes before submitting a pull request, and make sure `composer test` and `composer cs` pass.
+
+## Security
+
+If you discover a security vulnerability, please review [our security policy](SECURITY.md) for how to report it.
+
+## Credits
+
+* [Mateus Junges](https://github.com/mateusjunges)
+* [All Contributors](https://github.com/mateusjunges/laravel-cloudflare-mail/contributors)
 
 ## License
 

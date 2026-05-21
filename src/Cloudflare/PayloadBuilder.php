@@ -12,6 +12,8 @@ use Symfony\Component\Mime\Part\DataPart;
 use Throwable;
 
 /**
+ * @internal This class is not part of the package's public API and may change in any release.
+ *
  * @phpstan-import-type CloudflarePayload from CloudflareTypes
  * @phpstan-import-type CloudflareAttachment from CloudflareTypes
  */

@@ -12,6 +12,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\MessageConverter;
 
+/** @internal This class is not part of the package's public API and may change in any release. */
 final class CloudflareTransport extends AbstractTransport
 {
     public function __construct(

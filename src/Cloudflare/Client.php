@@ -10,6 +10,8 @@ use Junges\CloudflareMail\Exceptions\CloudflareTransportException;
 use SensitiveParameter;
 
 /**
+ * @internal This class is not part of the package's public API and may change in any release.
+ *
  * @phpstan-import-type CloudflarePayload from CloudflareTypes
  * @phpstan-import-type CloudflareResponseBody from CloudflareTypes
  */
@@ -68,7 +70,7 @@ final readonly class Client
     private function ensureNoBounces(Response $response, array $body): void
     {
         $bounces = data_get($body, 'result.permanent_bounces', []);
-        $bounces = is_array($bounces) ? array_values(array_filter($bounces, 'is_string')) : [];
+        $bounces = is_array($bounces) ? array_values(array_filter($bounces, is_string(...))) : [];
 
         throw_if(
             filled($bounces),
